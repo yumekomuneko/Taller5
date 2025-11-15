@@ -5,6 +5,8 @@ import { Payment } from './entities/payment.entity';
 import { CreatePaymentDto } from './dtos/create-payment.dto';
 import { Order, OrderStatus } from '../order/entities/order.entity';
 import { User } from '../user/entities/user.entity';
+import { UpdatePaymentDto } from './dtos/update-payment.dto';
+
 
 @Injectable()
 export class PaymentService {
@@ -32,7 +34,7 @@ export class PaymentService {
         const order = await this.orderRepo.findOne({ where: { id: dto.orderId }, relations: ['details'] });
         if (!order) throw new NotFoundException('Order not found');
 
-        if (order.status === OrderStatus.PAID) {
+        if ((order.status as any )=== OrderStatus.PAID) {
         throw new BadRequestException('Order is already paid');
         }
 
@@ -63,7 +65,7 @@ export class PaymentService {
 
 
         // actualizar orden a PAID
-        order.status = OrderStatus.PAID;
+        (order.status as any) = OrderStatus.PAID;
         await queryRunner.manager.save(order);
 
         // (opcional) lógica adicional: generar factura, notificar por mail, vaciar carrito
@@ -85,5 +87,17 @@ export class PaymentService {
         const p = await this.paymentRepo.findOne({ where: { id }, relations: ['order', 'user'] });
         if (!p) throw new NotFoundException(`Payment ${id} not found`);
         return p;
+    }
+
+    async update(id: number, dto:UpdatePaymentDto): Promise<Payment> {
+        const payment = await this.findOne(id);
+        Object.assign(payment, dto);
+        return this.paymentRepo.save(payment)
+    }
+
+    async remove(id: number): Promise<{message: string}>{
+        const payment = await this.findOne(id);
+        await this.paymentRepo.remove(payment);
+        return { message:`Payment ${id} a sido removida con exito` };
     }
 }

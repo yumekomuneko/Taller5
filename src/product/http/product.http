@@ -1,14 +1,32 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJlbWFpbCI6ImFuZ2llY2FiYWwzNUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjMxNTczNzMsImV4cCI6MTc2MzI0Mzc3M30.BzI7NpiIzdAUcGFSOMWOl9OqpcJumK0DjsVpzy98Hwg
+
 ### Crear producto
 POST {{baseUrl}}/products
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "nombre": "Mouse inalámbrico",
-    "descripcion": "Mouse ergonómico con conexión Bluetooth",
-    "precio": 120000,
-    "imagenUrl": "https://example.com/mouse.jpg",
+    "name": "Telefono celular",
+    "description": "Terreneitor 3000 ultimo en tecnology, más rapido que camaron que se duerme",
+    "price": 100000,
+    "cantidad": 50,
+    "imageUrl": "https://example.com/mouse.jpg",
     "categories": [1, 2]
+}
+
+### Crear producto con imagen
+POST {{baseUrl}}/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Teclado ergonómico",
+    "description": "Una teclado ergonómica de alta calidad",
+    "price": 10000,
+    "available": true,
+    "imageUrl": "https://example.com/keyboard.jpg",
+    "categories": [3, 5]
 }
 
 ### Listar todos los productos
@@ -16,7 +34,7 @@ GET {{baseUrl}}/products
 Authorization: Bearer {{token}}
 
 ### Obtener producto por ID
-GET {{baseUrl}}/products/1
+GET {{baseUrl}}/products/2
 Authorization: Bearer {{token}}
 
 ### Actualizar producto
@@ -25,10 +43,10 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "precio": 99000,
-    "disponible": false
+    "price": 99000,
+    "available": false
 }
 
-### Eliminar producto
+### Eliminar producto (Ahora lo pruebo)
 DELETE {{baseUrl}}/products/1
 Authorization: Bearer {{token}}

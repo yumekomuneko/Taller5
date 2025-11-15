@@ -1,10 +1,12 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJlbWFpbCI6ImFuZ2llY2FiYWwzNUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjMxNTczNzMsImV4cCI6MTc2MzI0Mzc3M30.BzI7NpiIzdAUcGFSOMWOl9OqpcJumK0DjsVpzy98Hwg
 ### Crear un pedido
 POST {{baseUrl}}/orders
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "userId": 2,
+    "userId": 1,
     "cartId": 1
 }
 
@@ -22,16 +24,16 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "status": "paid"
+    "status": "PENDING"
 }
 
 ### Cambiar estado del pedido
-PATCH {{baseUrl}}/orders/1/status
+PATCH {{baseUrl}}/orders/2/status
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "status": "shipped"
+    "status": "PENDING"
 }
 
 ### Eliminar pedido

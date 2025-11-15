@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from '../user/entities/user.entity';
@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { MailService } from './mail/mail.service';
+import { RegisterDto } from './dto/register.dto';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +16,7 @@ export class AuthService {
     private usersRepo: Repository<User>,
     private jwtService: JwtService,
     private mailService: MailService,
+    private readonly roleService: RoleService,
   ) {}
 
   private addHours(date: Date, hours: number) {
@@ -24,28 +27,31 @@ export class AuthService {
     return new Date(date.getTime() + minutes * 60 * 1000);
   }
 
-  // Registro de usuario
-  async register(email: string, password: string) {
-    const exists = await this.usersRepo.findOne({ where: { email } });
+async register(dto: RegisterDto) { 
+    const exists = await this.usersRepo.findOne({ where: { email: dto.email } });
     if (exists) throw new BadRequestException('El usuario ya existe');
 
-    const hashed = await argon2.hash(password);
+    const hashed = await argon2.hash(dto.password);
     const verificationToken = uuidv4();
 
     const user = this.usersRepo.create({
-      email,
+      email: dto.email,
       password: hashed,
+      nombre: dto.nombre,     
+      apellido: dto.apellido, 
+      telefono: dto.telefono,
       verificationToken,
       verificationTokenExpiresAt: this.addHours(new Date(), 5),
-      role: UserRole.CLIENT,
+      roleId: 2,
       isVerified: false,
     });
 
     await this.usersRepo.save(user);
-    await this.mailService.sendVerificationEmail(email, verificationToken);
+    await this.mailService.sendVerificationEmail(dto.email, verificationToken);
 
     return { message: 'Usuario registrado. Verifica tu correo.' };
-  }
+}
+
 
   // Verificación de correo
   async verifyEmail(token: string) {
@@ -83,7 +89,7 @@ export class AuthService {
 
     return {
       access_token: token,
-      user: { id: user.id, email: user.email, role: user.role },
+      user: { id: user.id, email: user.email, role: user.role.nombre },
     };
   }
 

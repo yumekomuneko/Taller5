@@ -125,12 +125,19 @@ export class OrderService {
     // UPDATE STATUS ONLY
     // ============================
     async updateStatus(id: number, status: OrderStatus) {
-        if (!Object.values(OrderStatus).includes(status)) {
-            throw new BadRequestException('Invalid order status');
-        }
+        const statusKey = status as unknown as string;
+        const finalDbValue = OrderStatus[statusKey as keyof typeof OrderStatus];
 
+        // 2. Validación: Si el valor final no se encontró (es decir, la clave es inválida), lanza el error.
+        if (!finalDbValue) {
+            // Genera la lista de claves válidas (ej: PENDING, CONFIRMED) para dar mejor feedback
+            const validKeys = Object.keys(OrderStatus).join(', ');
+            throw new BadRequestException(`Invalid order status: ${statusKey}. Must be one of the following keys: ${validKeys}`);
+        }
         const order = await this.findOne(id);
-        order.status = status;
+        // 3. Asignación: Guarda el valor real en español que irá a la base de datos
+        (order.status as any) = finalDbValue; 
+        
         return this.orderRepo.save(order);
     }
 

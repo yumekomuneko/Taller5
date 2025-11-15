@@ -1,3 +1,5 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJlbWFpbCI6ImFuZ2llY2FiYWwzNUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjMxNTczNzMsImV4cCI6MTc2MzI0Mzc3M30.BzI7NpiIzdAUcGFSOMWOl9OqpcJumK0DjsVpzy98Hwg
 ### Crear un rol
 POST {{baseUrl}}/roles
 Authorization: Bearer {{token}}

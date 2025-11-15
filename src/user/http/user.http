@@ -1,14 +1,25 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJlbWFpbCI6ImFuZ2llY2FiYWwzNUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjMxNTQ0MjEsImV4cCI6MTc2MzI0MDgyMX0.1eIMvB4rcehlncHCOD4VSs9refki9lashXCpaZ0-naY
+
 ### Crear usuario
 POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-    "nombre": "Carlos",
-    "apellido": "Pérez",
-    "email": "carlos@example.com",
-    "telefono": "3200000000",
-    "password": "123456",
-    "roleId": 2
+    "nombre": "Adriana",
+    "apellido": "Caicedo",
+    "email": "angiecabal35@gmail.com",
+    "telefono": "3200000002",
+    "password": "12345678",
+    "role": "ADMIN"
+}
+
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "angiecabal35@gmail.com",
+    "password": "12345678"
 }
 
 ### Listar todos los usuarios (solo admin)
@@ -25,10 +36,10 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "telefono": "3109999999",
-    "password": "nuevaClaveSegura"
+    "telefono": "31099879",
+    "password": "sissonidoClaveSegura"
 }
 
 ### Eliminar un usuario (solo admin)
-DELETE {{baseUrl}}/users/1
+DELETE {{baseUrl}}/users/9
 Authorization: Bearer {{token}}

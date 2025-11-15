@@ -1,12 +1,14 @@
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJlbWFpbCI6ImFuZ2llY2FiYWwzNUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjMxNTczNzMsImV4cCI6MTc2MzI0Mzc3M30.BzI7NpiIzdAUcGFSOMWOl9OqpcJumK0DjsVpzy98Hwg
 ### Crear un pago
 POST {{baseUrl}}/payments
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "orderId": 1,
-    "userId": 2,
-    "amount": 250.00,
+    "orderId": 2,
+    "userId": 1,
+    "amount": 2500000,
     "method": "credit_card",
     "transactionId": "TX-123456"
 }
@@ -30,7 +32,7 @@ Content-Type: application/json
 }
 
 ### Cambiar estado del pago
-PATCH {{baseUrl}}/payments/1/status
+PATCH {{baseUrl}}/payments/2
 Authorization: Bearer {{token}}
 Content-Type: application/json
 

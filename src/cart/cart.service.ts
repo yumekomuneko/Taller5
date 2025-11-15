@@ -49,13 +49,13 @@ export class CartService {
     // CREATE CART
     // ============================
     async create(dto: CreateCartDto): Promise<Cart> {
+        // ... (Verificación de usuario y carrito existente) ...
         const user = await this.userRepo.findOne({ where: { id: dto.userId } });
 
         if (!user) {
         throw new NotFoundException('User not found');
         }
 
-        // Check if user already has an active cart
         const existingCart = await this.cartRepo.findOne({
         where: { user: { id: dto.userId }, checkedOut: false },
         });
@@ -68,17 +68,30 @@ export class CartService {
 
         // If includes products
         if (dto.productIds?.length) {
-        const products = await this.productRepo.find({
-            where: { id: In(dto.productIds) },
-        });
+            // Cargar los productos con los campos necesarios (available y quantity)
+            const products = await this.productRepo.find({
+                where: { id: In(dto.productIds) },
+                select: ['id', 'name', 'available', 'cantidad'], 
+            });
 
-        if (products.length !== dto.productIds.length) {
-            throw new BadRequestException(
-            'One or more product IDs do not exist',
+            if (products.length !== dto.productIds.length) {
+                throw new BadRequestException(
+                'One or more product IDs do not exist',
+                );
+            }
+
+            // VALIDACIÓN DE DISPONIBILIDAD (Nueva Lógica)
+            const unavailableProducts = products.filter(
+                (p) => p.available === false || p.cantidad <= 0,
             );
-        }
 
-        cart.products = products;
+            if (unavailableProducts.length > 0) {
+                const names = unavailableProducts.map((p) => p.name).join(', ');
+                throw new BadRequestException(
+                    `No se puede crear el carrito. Productos agotados o no disponibles: ${names}.`,
+                );
+            }
+            cart.products = products;
         }
 
         return this.cartRepo.save(cart);

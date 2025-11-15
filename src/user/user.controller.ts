@@ -1,12 +1,14 @@
 import {
-  Controller,
-  Get,
-  Patch,
-  Param,
-  Body,
-  UseGuards,
-  Request,
-  ForbiddenException,
+    Controller,
+    Get,
+    Patch,
+    Param,
+    Body,
+    UseGuards,
+    Request,
+    ForbiddenException,
+    Post,
+    Delete
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -15,6 +17,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from './entities/user.entity';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -25,7 +29,7 @@ export class UserController {
 
     /** 🧍 Perfil del usuario autenticado */
     @Get('profile')
-    async getProfile(@Request() req) {
+    async getProfile(@Request() req: any) {
         const user = await this.userService.findOne(req.user.userId);
         if (!user) throw new ForbiddenException('Usuario no encontrado');
         return user;
@@ -45,9 +49,30 @@ export class UserController {
         return this.userService.findOne(id);
     }
 
+    /** 👤 Crear usuario (solo ADMIN) */
+    @Post()
+    @Public()
+    async create(@Body() dto: CreateUserDto) {
+        return this.userService.create(dto);
+    }
+
+
+
     /** ✏️ Actualizar datos del usuario autenticado */
     @Patch('update')
-    async updateProfile(@Request() req, @Body() dto: UpdateUserDto) {
+    async updateProfile(@Request() req: any, @Body() dto: UpdateUserDto) {
         return this.userService.update(req.user.userId, dto);
+    }
+
+    @Patch(':id')
+    @Roles(UserRole.ADMIN)
+    async update(@Param('id') id: number, @Body() dto: UpdateUserDto) {
+        return this.userService.update(id, dto);
+    }
+
+    @Delete(':id')
+    @Roles(UserRole.ADMIN)
+    async delete(@Param('id') id: number) {
+        return this.userService.delete(id);
     }
 }

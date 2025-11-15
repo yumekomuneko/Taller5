@@ -3,9 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToMany,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
 import { Cart } from '../../cart/entities/cart.entity';
+import { Role } from '../../role/entities/role.entity';
 
 // Enum de roles de usuario
 export enum UserRole {
@@ -33,25 +37,21 @@ export class User {
   @Column({ nullable: true })
   telefono?: string;
 
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.CLIENT,
-  })
-  role: UserRole;
+  @Column({ name: 'roleId', type: 'int', default: 2 })
+  roleId: number;
 
   // Verificación de correo
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   verificationToken?: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
   verificationTokenExpiresAt?: Date | null;
 
   // Recuperación de contraseña
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   resetToken?: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -64,4 +64,8 @@ export class User {
   // Relación con carritos
   @OneToMany(() => Cart, (cart) => cart.user)
   carts: Cart[];
+
+  @ManyToOne(()=> Role, (role)=>role.users)
+  @JoinColumn({name: 'roleId'})
+  role: Role;
 }

@@ -40,6 +40,8 @@ export class ProductService {
         const { categories, ...data } = dto;
         const productEntity = this.productRepo.create(data);
 
+        productEntity.available = productEntity.cantidad > 0;
+
         if (categories?.length) {
         const foundCategories = await this.categoryRepo.find({
             where: { id: In(categories) },

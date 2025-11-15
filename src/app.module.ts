@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,15 +15,21 @@ import { RoleModule } from './role/role.module';
 import { UserModule } from './user/user.module';
 import { CartModule } from './cart/cart.module';
 import { AuthModule } from './auth/auth.module';
+/*import { ChatModule } from './chat/chat.module'; */
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    /*ChatModule,*/
+    AuthModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '3131',
+      password: '1947',
       database: 'taller5', // Nombre de la base de datos
       autoLoadEntities: true,
       synchronize: true,
