@@ -1,14 +1,19 @@
 // chat.service.ts - VERSIÓN SIMPLIFICADA PARA PROBAR
 import { Injectable } from '@nestjs/common';
 import { ProductService } from '../product/product.service';
+import { OrderService } from '../order/order.service';
+import {PaymentMethodService} from '../pay-methods/pay-method.service';
+
 
 @Injectable()
 export class ChatService {
     constructor(
-        private productService: ProductService
+        private productService: ProductService,
+        private orderService: OrderService,
+        private paymentMethodService: PaymentMethodService,
     ) {}
 
-    /** 🔍 CONSULTAR DISPONIBILIDAD DE PRODUCTO */
+    //CONSULTAR DISPONIBILIDAD DE PRODUCTO //
     async checkProductAvailability(productQuery: string, customerId: string) {
         console.log(`🔍 Buscando producto: ${productQuery}`);
         
@@ -41,7 +46,7 @@ export class ChatService {
         };
     }
 
-    /** ⚖️ COMPARAR PRODUCTOS */
+    // COMPARAR PRODUCTOS //
     async compareProducts(productQueries: string[]) {
         console.log(`⚖️ Comparando productos: ${productQueries.join(', ')}`);
         
@@ -70,7 +75,7 @@ export class ChatService {
         };
     }
 
-    /** 🛡️ OBTENER INFORMACIÓN DE GARANTÍA */
+    //OBTENER INFORMACIÓN DE GARANTÍA //
     async getWarrantyInfo(productQuery: string) {
         console.log(`🛡️ Consultando garantía para: ${productQuery}`);
         
@@ -93,179 +98,133 @@ export class ChatService {
         };
     }
 
-    // Métodos placeholder para las otras funcionalidades
-    async getCustomerOrderHistory(customerId: string) {
-        return {
-            totalOrders: 0,
-            totalSpent: 0,
-            recentOrders: [],
-            favoriteCategory: 'Sin compras',
-            message: 'Funcionalidad en desarrollo'
-        };
-    }
-
-    async getPaymentMethodsInfo() {
-        return {
-            methods: [
-                {
-                    type: 'credit_card',
-                    name: 'Tarjeta de Crédito',
-                    description: 'Visa, MasterCard, American Express'
-                }
-            ],
-            message: 'Funcionalidad en desarrollo'
-        };
-    }
-}
-
-/*import { Injectable } from '@nestjs/common';
-import { ProductService } from '../product/product.service';
-import { OrderService } from '../order/order.service';
-import { PaymentService } from '../payment/payment.service';
-
-@Injectable()
-export class ChatService {
-    constructor(
-        private productService: ProductService,
-        private orderService: OrderService,
-        private paymentService: PaymentService
-    ) {}
-
-    async checkProductAvailability(productQuery: string, customerId: string) {
-        const product = await this.productService.findByQuery(productQuery);
-    
-        if (!product) {
-        return {
-            available: false,
-            message: `No encontré el producto "${productQuery}"`
-        };
-        }
-
-        const stockInfo = await this.productService.getStockInfo(product.id);
-        const recommendations = await this.productService.getRecommendations(product.id, customerId);
-
-        return {
-            available: stockInfo.quantity > 0,
-            product: {
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                sku: product.sku
-            },
-            stock: stockInfo,
-            message: stockInfo.quantity > 0 
-                ? ` ${product.name} está disponible. Stock: ${stockInfo.quantity} unidades. Precio: $${product.price}`
-                : ` ${product.name} está agotado. Te avisaremos cuando esté disponible.`,
-            recommendations: recommendations.slice(0, 3)
-        };
-    }
-
-    async compareProducts(productQueries: string[]) {
-        const products = await Promise.all(
-            productQueries.map(query => this.productService.findByQuery(query))
-        );
-
-        const validProducts = products.filter(p => p !== null);
-    
-        if (validProducts.length < 2) {
+    // OBTENER MÉTODOS DE PAGO DISPONIBLES //
+    async getPaymentMethodsInfo(): Promise<{
+        methods: any[];
+        securityInfo?: any;
+        message: string;
+        tips?: string[];
+    }> { 
+        try {
+            console.log('🔧 Llamando a getAvailablePaymentMethods...');
+            const methods = await this.paymentMethodService.getAvailablePaymentMethods();
+        
             return {
-                success: false,
-                message: 'Necesita al menos 2 productos válidos para comparar'
+                methods: methods,
+                securityInfo: {
+                    encrypted: true,
+                    fraudProtection: true,
+                    moneyBackGuarantee: true,
+                    sslCertified: true
+                },
+                message: `💳 Tenemos ${methods.length} métodos de pago disponibles para ti:`,
+                tips: [
+                    '💡 Todas las transacciones están protegidas con encriptación SSL',
+                    '🛡️ Protección contra fraudes incluida', 
+                    '↩️ Garantía de devolución de 30 días',
+                    '📞 Soporte 24/7 para problemas de pago'
+                ]
+            };
+        } catch (error) {
+            console.error('Error obteniendo métodos de pago:', error);
+            // Datos de respaldo CON securityInfo incluido
+            return {
+                methods: [
+                    {
+                        method: 'credit_card',
+                        name: 'Tarjeta de Crédito',
+                        description: 'Pago seguro con tarjeta de crédito',
+                        supportedCards: ['Visa', 'MasterCard', 'American Express'],
+                        installments: 'Hasta 12 cuotas sin interés',
+                        processingTime: 'Instantáneo'
+                    },
+                    {
+                        method: 'debit_card',
+                        name: 'Tarjeta de Débito', 
+                        description: 'Pago directo desde tu cuenta',
+                        supportedCards: ['Visa', 'MasterCard'],
+                        installments: 'Pago único',
+                        processingTime: 'Instantáneo'
+                    },
+                    {
+                        method: 'paypal',
+                        name: 'PayPal',
+                        description: 'Pago rápido y seguro con PayPal',
+                        processingTime: 'Instantáneo'
+                    },
+                    {
+                        method: 'bank_transfer',
+                        name: 'Transferencia Bancaria',
+                        description: 'Transferencia desde tu banco',
+                        processingTime: '1-2 días hábiles'
+                    }
+                ],
+                securityInfo: { // 👈 Incluir securityInfo aquí también
+                    encrypted: true,
+                    fraudProtection: true, 
+                    moneyBackGuarantee: true,
+                    sslCertified: true
+                },
+                message: '💳 Métodos de pago disponibles:',
+                tips: [
+                    'Todas las transacciones están protegidas',
+                    'Garantía de devolución de 30 días'
+                ]
             };
         }
-
-        const comparison = validProducts.map(product => ({
-            name: product.name,
-            price: product.price,
-            rating: product.rating,
-            features: product.features,
-            warranty: product.warranty,
-            stock: product.stock,
-            image: product.image
-        }));
-
-        return {
-            success: true,
-            products: comparison,
-            message: `He comparado ${validProducts.length} productos:`
-        };
     }
 
-    async getCustomerOrderHistory(customerId: string) {
-        const orders = await this.orderService.findByCustomer(customerId);
-    
-        return {
-            totalOrders: orders.length,
-            totalSpent: orders.reduce((sum, order) => sum + order.total, 0),
-            recentOrders: orders.slice(0, 5).map(order => ({
-                id: order.id,
-                date: order.date,
-                total: order.total,
-                status: order.status,
-                items: order.items.length
-            })),
-            favoriteCategory: this.calculateFavoriteCategory(orders)
-        };
-    }*/
-
-    /*async getPaymentMethodsInfo() {
-        const methods = await this.paymentService.getAvailableMethods();
-        const installmentInfo = await this.paymentService.getInstallmentOptions();
-
-        return {
-            methods: methods.map(method => ({
-                type: method.type,
-                name: method.name,
-                description: method.description,
-                fees: method.fees,
-                limits: method.limits
-            })),
-            installments: installmentInfo,
-            securityInfo: {
-                encrypted: true,
-                fraudProtection: true,
-                moneyBackGuarantee: true
-            }
-        };
-    }
-
-    async getWarrantyInfo(productQuery: string) {
-        const product = await this.productService.findByQuery(productQuery);
-    
-        if (!product) {
-        return {
-            found: false,
-            message: `No encontré el producto "${productQuery}"`
-        };
-        }
-
-        const warranty = await this.productService.getWarrantyInfo(product.id);
-
-        return {
-            found: true,
-            product: product.name,
-            warranty: {
-                duration: warranty.duration,
-                type: warranty.type,
-                coverage: warranty.coverage,
-                conditions: warranty.conditions,
-                contact: warranty.contactSupport
-            },
-            message: `Garantía de ${product.name}: ${warranty.duration} - ${warranty.type}`
-        };
-    }
+    //categoria favorita//
 
     private calculateFavoriteCategory(orders: any[]): string {
-        // Lógica para calcular categoría favorita
+        if (!orders || orders.length === 0) return 'Sin compras';
+        
         const categoryCount = {};
         orders.forEach(order => {
-            order.items.forEach(item => {
-                categoryCount[item.category] = (categoryCount[item.category] || 0) + 1;
+            order.details?.forEach(detail => {
+                if (detail.product?.categories) {
+                    detail.product.categories.forEach(category => {
+                        categoryCount[category.name] = (categoryCount[category.name] || 0) + 1;
+                    });
+                }
             });
         });
-    
-        return Object.keys(categoryCount).reduce((a, b) => 
-        categoryCount[a] > categoryCount[b] ? a : b
+
+        const categories = Object.keys(categoryCount);
+        if (categories.length === 0) return 'Sin categoría';
+
+        return categories.reduce((a, b) => 
+            categoryCount[a] > categoryCount[b] ? a : b
         );
     }
-}*/
+
+        // OBTENER HISTORIAL DE PEDIDOS DEL CLIENTE //
+    async getCustomerOrderHistory(customerId: string) {
+        try {
+            // Necesitas implementar este método en OrderService
+            const orders = await this.orderService.getUserOrderHistory(Number(customerId));
+            
+            return {
+                totalOrders: orders.length,
+                totalSpent: orders.reduce((sum, order) => sum + Number(order.total), 0),
+                recentOrders: orders.slice(0, 5).map(order => ({
+                    id: order.id,
+                    date: order.createdAt,
+                    total: order.total,
+                    status: order.status,
+                    items: order.details?.length || 0
+                })),
+                favoriteCategory: this.calculateFavoriteCategory(orders),
+                message: `Tienes ${orders.length} pedidos en tu historial`
+            };
+        } catch (error) {
+            return {
+                totalOrders: 0,
+                totalSpent: 0,
+                recentOrders: [],
+                favoriteCategory: 'Sin compras',
+                message: 'Aún no tienes pedidos en tu historial'
+            };
+        }
+    }
+}

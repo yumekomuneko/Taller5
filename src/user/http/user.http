@@ -6,13 +6,15 @@ POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-    "nombre": "Adriana",
-    "apellido": "Caicedo",
-    "email": "angiecabal3@gmail.com",
+    "nombre": "Dajaryth",
+    "apellido": "Hernandez",
+    "email": "dajaryth@gmail.com",
     "telefono": "32000000",
     "password": "12345678",
-    "roleId": 1
+    "role": "ADMIN"
 }
+
+
 
 POST {{baseUrl}}/auth/login
 Content-Type: application/json

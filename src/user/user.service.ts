@@ -70,24 +70,32 @@ export class UserService {
     // ===========================
     async create(dto: CreateUserDto) {
         const roleName = dto.role || UserRole.CLIENT;
+
+        console.log('Buscanco el rol:', roleName);
         
         // 1. Obtener la entidad Role
         const roleEntity = await this.roleService.findOneByName(roleName as string);
         if (!roleEntity) {
-            throw new InternalServerErrorException(`Role ${roleName} not found`);
+            console.log('Roles disponibles:', await this.roleService.findAll());
+            throw new InternalServerErrorException(`Role "${roleName}" not found. Available roles: ADMIN, CLIENT`);
         }
         
         // 2. usar entidad rol
         const { role, ...restOfDto } = dto;
         
         const user = this.usersRepo.create({
-            ...restOfDto, 
-            role: roleEntity, // Asignar la entidad Role correcta
+            nombre: dto.nombre,
+            apellido: dto.apellido,
+            email: dto.email,
+            telefono: dto.telefono,
+            role: roleEntity,
         });
         
         if (dto.password) {
             user.password = await argon2.hash(dto.password);
         }
+
+        user.password = await argon2.hash(dto.password);
         
         return this.usersRepo.save(user);
     }

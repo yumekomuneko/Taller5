@@ -75,6 +75,16 @@ export class OrderService {
         return order;
     }
 
+    //ordenes por usuario
+    // order.service.ts - Método faltante
+    async getUserOrderHistory(userId: number): Promise<Order[]> {
+        return this.orderRepo.find({
+            where: { user: { id: userId } },
+            relations: ['details', 'details.product'],
+            order: { createdAt: 'DESC' }
+        });
+    }
+
     // ============================
     // FIND ORDERS BY USER
     // ============================

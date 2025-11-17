@@ -14,15 +14,21 @@ export class ProductService {
         private readonly productRepo: Repository<Product>,
         @InjectRepository(Category)
         private readonly categoryRepo: Repository<Category>,
+
     ) {}
 
     // ========== MÉTODOS ORIGINALES (CRUD) ==========
 
     /** Obtener todos los productos */
     async findAll(): Promise<Product[]> {
-        const products = await this.productRepo.find({ relations: ['categories'] });
-        return products.map((p) => ({
+        const products = await this.productRepo.find({ 
+            relations: ['categories'] });
+        
+        return products.map(product => ({
+            ...product,
+            price: Number(product.price)
         }));
+        
     }
 
     /** Obtener un producto por ID */
@@ -210,4 +216,5 @@ export class ProductService {
             ]
         }));
     }
+
 }

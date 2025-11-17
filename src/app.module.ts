@@ -10,6 +10,7 @@ import { InvoiceModule } from './invoice/invoice.module';
 import { OrderModule } from './order/order.module';
 import { OrderDetailModule } from './order-detail/order-detail.module';
 import { PaymentModule } from './payment/payment.module';
+import { PaymentMethodModule } from './pay-methods/pay-method.module';
 import { ProductModule } from './product/product.module';
 import { RoleModule } from './role/role.module';
 import { UserModule } from './user/user.module';
@@ -29,7 +30,7 @@ import { ChatModule } from './chat/chat.module';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '1111',
+      password: '1947',
       database: 'taller5', // Nombre de la base de datos
       autoLoadEntities: true,
       synchronize: true,
@@ -40,10 +41,12 @@ import { ChatModule } from './chat/chat.module';
     OrderModule,
     OrderDetailModule,
     PaymentModule,
+    PaymentMethodModule,
     ProductModule,
     RoleModule,
     UserModule,
     CartModule,
+    ChatModule,
     AuthModule,
   ],
 
