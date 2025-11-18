@@ -33,7 +33,8 @@ import { ChatModule } from './chat/chat.module';
       password: '1947',
       database: 'taller5', // Nombre de la base de datos
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
+      migrationsRun: true,
     }),
 
     CategoryModule,

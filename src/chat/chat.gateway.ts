@@ -17,9 +17,12 @@ interface ChatContext {
   comparisonProducts?: string[];
 }
 
-@WebSocketGateway(81, {
-  cors: { origin: '*' },
-  namespace: '/ecommerce-chat'
+@WebSocketGateway({
+  cors: {
+    origin: process.env.CORS_ORIGIN || true,
+    credentials: true,
+  },
+  namespace: '/ecomerce-chat'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(ChatGateway.name);
