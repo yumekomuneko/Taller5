@@ -33,6 +33,9 @@ import { ChatModule } from './chat/chat.module';
       password: '1947',
       database: 'taller5', // Nombre de la base de datos
       autoLoadEntities: true,
+      url: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: false,
       migrationsRun: true,
     }),
