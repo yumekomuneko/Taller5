@@ -34,7 +34,8 @@ import { ChatModule } from './chat/chat.module';
       database: 'taller5',
       autoLoadEntities: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false,
+      logging: process.env.NODE_ENV !== 'production',
       
       ssl: false,
       extra: process.env.NODE_ENV === 'production' ? {
