@@ -31,13 +31,17 @@ import { ChatModule } from './chat/chat.module';
       port: 5432,
       username: 'postgres',
       password: '1947',
-      database: 'taller5', // Nombre de la base de datos
+      database: 'taller5',
       autoLoadEntities: true,
-      url: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      migrationsRun: true,
+      synchronize: true,
+      
+      ssl: false,
+      extra: process.env.NODE_ENV === 'production' ? {
+        ssl: {
+          rejectUnauthorized: false
+        }
+      } : undefined,
     }),
 
     CategoryModule,

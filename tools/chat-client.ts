@@ -1,13 +1,14 @@
-import { io, Socket } from 'socket.io-client';
-import * as readline from 'readline';
+// USAR COMMONJS - NO MÁS PROBLEMAS DE IMPORTACIÓN
+const io = require('socket.io-client');
+const readline = require('readline');
 
 class InteractiveChatClient {
-    private socket: Socket;
-    private rl: readline.Interface;
+    private socket: any;
+    private rl: any;
     private currentOptions: string[] = [];
 
     constructor() {
-        this.socket = io('http://localhost:81/ecommerce-chat', {
+        this.socket = io('http://localhost:3000/ecomerce-chat', {
             transports: ['websocket']
         });
 
@@ -42,7 +43,7 @@ class InteractiveChatClient {
             this.rl.close();
         });
 
-        this.socket.on('bot_message', (data) => {
+        this.socket.on('bot_message', (data: any) => {
             console.log('🔧 [CLIENT DEBUG] Tipo recibido:', data.type);
             
             // Manejar métodos de pago específicamente
@@ -95,7 +96,7 @@ class InteractiveChatClient {
             console.log('\n💬 Escribe tu mensaje o número de opción:');
         });
 
-        this.socket.on('connect_error', (error) => {
+        this.socket.on('connect_error', (error: any) => {
             console.log('❌ Error de conexión:', error.message);
         });
     }
@@ -141,7 +142,7 @@ class InteractiveChatClient {
     }
 
     private setupUserInput() {
-        this.rl.on('line', (input) => {
+        this.rl.on('line', (input: string) => {
             const trimmedInput = input.trim();
             
             if (trimmedInput === 'exit' || trimmedInput === 'quit') {
