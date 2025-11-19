@@ -7,7 +7,7 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    return 'API está corriendo yeiii';
+    return 'API está corriendo yeiii, La gente juiciosa tiene resultados';
   }
 
 }
