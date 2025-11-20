@@ -1,6 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJlbWFpbCI6ImFuZ2llY2FiYWwzNUBnbWFpbC5jb20iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzYzMjQ3ODY4LCJleHAiOjE3NjMzMzQyNjh9.wmPAjDOn00aDMIvcNY7KBgR3Ew6f8JIqK00jZHAd2Mc
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjUsImVtYWlsIjoiYW5naWVjYWJhbDM1QGdtYWlsLmNvbSIsInJvbGUiOiJDTElFTlQiLCJpYXQiOjE3NjM2MTMwMzksImV4cCI6MTc2MzY5OTQzOX0.RPNDO9GuLBwZ_82DY91gn4H6liluLRKBxmACepy1ppU
 
 ### Crear una Orden (USO CLIENTE)
 // El stock se descuenta aquí. El cartId debe ser del usuario y estar checkedOut: true.
@@ -9,7 +8,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "cartId": 11
+    "cartId": 4
 }
 
 
@@ -19,12 +18,12 @@ Authorization: Bearer {{token}}
 
 
 ### Ver Mi Orden Específica by ID
-GET {{baseUrl}}/orders/2
+GET {{baseUrl}}/orders/3
 Authorization: Bearer {{token}}
 
 
 ###Intentar ver la Orden de Otro Usuario (IDOR Check)
-GET {{baseUrl}}/orders/1
+GET {{baseUrl}}/orders/4
 Authorization: Bearer {{token}}
 
 
@@ -64,7 +63,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "cartId": 7
+    "cartId": 2
 }
 
 

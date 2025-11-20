@@ -17,6 +17,7 @@ import { UserModule } from './user/user.module';
 import { CartModule } from './cart/cart.module';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { ChatModule } from './chat/chat.module';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '1947',
+      password: '1111',
       database: 'taller5', // Nombre de la base de datos
       autoLoadEntities: true,
       synchronize: true,
@@ -48,6 +49,7 @@ import { ChatModule } from './chat/chat.module';
     CartModule,
     ChatModule,
     AuthModule,
+    StripeModule,
   ],
 
   controllers: [AppController],

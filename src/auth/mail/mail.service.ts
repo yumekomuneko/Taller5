@@ -4,35 +4,35 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailService {
-  private transporter;
-  private readonly logger = new Logger(MailService.name);
+    private transporter;
+    private readonly logger = new Logger(MailService.name);
 
-  constructor(private configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // TLS
-      auth: {
-        user: this.configService.get<string>('MAIL_USER'),
-        pass: this.configService.get<string>('MAIL_PASS'),
-      },
-    });
-  }
+    constructor(private configService: ConfigService) {
+        this.transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: false, // TLS
+            auth: {
+                user: this.configService.get<string>('MAIL_USER'),
+                pass: this.configService.get<string>('MAIL_PASS'),
+            },
+        });
+    }
 
-  async sendMail(to: string, subject: string, html: string) {
-    const info = await this.transporter.sendMail({
-      from: `"TechStore" <${this.configService.get<string>('MAIL_USER')}>`,
-      to,
-      subject,
-      html,
-    });
+    async sendMail(to: string, subject: string, html: string) {
+        const info = await this.transporter.sendMail({
+        from: `"TechStore" <${this.configService.get<string>('MAIL_USER')}>`,
+        to,
+        subject,
+        html,
+        });
 
     this.logger.debug(`Correo enviado a ${to} (ID: ${info.messageId})`);
     return info;
-  }
+}
 
 
-  async sendVerificationEmail(to: string, token: string) {
+    async sendVerificationEmail(to: string, token: string) {
     const baseUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000'; 
     const link = `${baseUrl.replace(/\/$/, '')}/auth/verify?token=${token}`; 
 

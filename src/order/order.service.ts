@@ -1,4 +1,3 @@
-
 import {
     Injectable,
     NotFoundException,
@@ -189,8 +188,8 @@ export class OrderService {
                 total += subtotal;
 
                 // Descontar stock
-                product.cantidad -= requestedQuantity;
-                await queryRunner.manager.save(Product, product);
+               /* product.cantidad -= requestedQuantity;
+                await queryRunner.manager.save(Product, product); */
 
                 // Crar detalle con ID de orden
                 const detail = queryRunner.manager.create(OrderDetail, {
@@ -244,26 +243,32 @@ export class OrderService {
         return this.orderRepo.save(order);
     }
 
-    // ============================
-    // UPDATE STATUS
-    // ============================
     async updateStatus(
         id: number,
-        status: OrderStatus,
+        newStatus: OrderStatus, // Renombrado a 'newStatus' para mayor claridad
         currentUserId?: number,
     ): Promise<Order> {
-        const order = await this.findOne(id, currentUserId);
+        // 1. OBTENER LA ORDEN CON RELACIONES DE STOCK
+        const order = await this.orderRepo.findOne({
+            where: { id },
+            relations: ['user', 'details', 'details.product'], // 👈 Importante: cargar ítems y producto
+        });
 
-        const statusKey = status as unknown as string;
+        if (!order) {
+            throw new NotFoundException(`Order ${id} not found`);
+        }
 
-        // Si es cliente, solo puede cancelar
+        const statusKey = newStatus as unknown as string;
+        
+        // --- VALIDACIONES DE ESTADO ---
+        
+        // 2. Si es cliente, solo puede CANCELAR y solo si está PENDING
         if (currentUserId) {
-            if (statusKey !== 'CANCELLED') {
+            if (statusKey !== OrderStatus.CANCELLED) {
                 throw new ForbiddenException(
                     'Clients can only cancel their orders'
                 );
             }
-
             if (order.status !== OrderStatus.PENDING) {
                 throw new BadRequestException(
                     'You can only cancel orders that are in PENDING status'
@@ -271,7 +276,7 @@ export class OrderService {
             }
         }
 
-        // Validar status válido
+        // 3. Validar status válido (usando el Enum)
         const finalDbValue = OrderStatus[statusKey as keyof typeof OrderStatus];
 
         if (!finalDbValue) {
@@ -280,10 +285,70 @@ export class OrderService {
                 `Invalid order status: ${statusKey}. Must be one of: ${validKeys}`
             );
         }
+        
+        // --- LÓGICA DE NEGOCIO CRÍTICA (Descuento de Stock) ---
+        
+        // 4. DESCUENTO DE STOCK (Solo si pasa a PAID y no estaba PAID previamente)
+        if (finalDbValue === OrderStatus.PAID && order.status !== OrderStatus.PAID) {
+            
+            if (!order.details || order.details.length === 0) {
+                throw new BadRequestException('Cannot confirm payment for an order with no items.');
+            }
+            
+            // Usamos una transacción para asegurar la consistencia del stock
+            const queryRunner = this.dataSource.createQueryRunner();
+            await queryRunner.connect();
+            await queryRunner.startTransaction();
 
-        order.status = finalDbValue;
+            try {
+                for (const detail of order.details) {
+                    const productId = detail.product.id;
+                    const quantity = detail.quantity;
 
-        return this.orderRepo.save(order);
+                    // 4a. Obtener el producto con bloqueo de escritura
+                    const product = await queryRunner.manager.findOne(Product, {
+                        where: { id: productId },
+                        lock: { mode: 'pessimistic_write' },
+                    });
+
+                    if (!product) {
+                        throw new NotFoundException(`Product ID ${productId} not found during stock update.`);
+                    }
+
+                    // 4b. Validar y descontar stock
+                    if (product.cantidad < quantity) {
+                        // Si no hay stock, esto es un error grave (debería haberse capturado en create)
+                        throw new BadRequestException(`Insufficient stock for product "${product.name}" during payment confirmation.`);
+                    }
+
+                    product.cantidad -= quantity;
+                    await queryRunner.manager.save(Product, product);
+                }
+                
+                // 4c. Actualizar el estado de la orden en la misma transacción
+                order.status = finalDbValue;
+                const savedOrder = await queryRunner.manager.save(Order, order);
+                
+                await queryRunner.commitTransaction();
+                return savedOrder;
+
+            } catch (error) {
+                await queryRunner.rollbackTransaction();
+                // Si falla el descuento de stock (ej. stock insuficiente), lanzamos el error
+                throw error; 
+            } finally {
+                await queryRunner.release();
+            }
+        }
+        
+        // 5. Si no es un cambio a PAID, solo actualiza el estado normalmente (ej. PENDING a CANCELLED)
+        if (order.status !== finalDbValue) {
+            order.status = finalDbValue;
+            return this.orderRepo.save(order);
+        }
+        
+        // Si no hubo cambio de estado, retorna la orden
+        return order;
     }
 
     // ============================

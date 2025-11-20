@@ -5,9 +5,9 @@ import { Cart } from '../../cart/entities/cart.entity';
 
 
 export enum OrderStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  CANCELLED = 'cancelled',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED',
 }
 
 @Entity('orders')

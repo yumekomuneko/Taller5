@@ -77,7 +77,10 @@ async register(dto: RegisterDto) {
 
     const user = await this.usersRepo.findOne({ 
         where: { email },
-        relations: ['role']
+        relations: ['role'],
+        select: [
+            'id', 'email', 'password', 'isVerified'
+        ]
     }); 
 
     if (!user) throw new BadRequestException('Usuario no encontrado');

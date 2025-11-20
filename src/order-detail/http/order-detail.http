@@ -1,6 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIyLCJlbWFpbCI6ImFuZ2llY2FiYWwzNUBnbWFpbC5jb20iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzYzMjQ3ODY4LCJleHAiOjE3NjMzMzQyNjh9.wmPAjDOn00aDMIvcNY7KBgR3Ew6f8JIqK00jZHAd2Mc
-
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYW5naWVjYWJhbDM1QGdtYWlsLmNvbSIsInJvbGUiOiJDTElFTlQiLCJpYXQiOjE3NjM0NDA4NDUsImV4cCI6MTc2MzUyNzI0NX0.dzE4gXMQfoJ3jrq0o9Xd577u_jnsX-h2-1SKWtWCPl8
 
 ### 1. Crear Detalle de Pedido (Solo Admin / Lógica interna)
 POST {{baseUrl}}/order-details
@@ -8,7 +7,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "orderId": 1,
+    "orderId": 3,
     "productId": 3,
     "quantity": 2
 }
@@ -20,7 +19,7 @@ Authorization: Bearer {{token}}
 
 
 ### 3. Obtener un Detalle por ID (Funciona con token de CLIENTE o ADMIN)
-GET {{baseUrl}}/order-details/28
+GET {{baseUrl}}/order-details/1
 Authorization: Bearer {{token}}
 
 
